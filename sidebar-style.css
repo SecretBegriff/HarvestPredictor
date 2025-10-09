@@ -107,6 +107,12 @@ a.sidebar-link:hover {
     border-left: 3px solid #005813; 
 }
 
+a.sidebar-link.active {
+    background-color: #a1c188;
+    color: #fff;
+    border-left: 3px solid #005813; 
+}
+
 .sidebar-item {
     position: relative;
 }
