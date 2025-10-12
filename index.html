@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Predictor</title>
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link href='https://cdn.boxicons.com/fonts/transformations.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="sidebar-style.css">
+    <link rel="stylesheet" href="cards-style.css">
+    <link rel="stylesheet" href="chart-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <aside id="sidebar">
+            <div class="d-flex justify-content-between p-4">
+                <div class="sidebar-logo">
+                    <i class='bx bx-plant-pot bx-lg'></i>
+                    <br> 
+                    <a href="#">Harvest Predictor</a>
+                </div>
+                <button class="toggle-btn border-0" type="button"><i id="icon" class='bx  bx-chevrons-right bx-sm'></i> </button>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <a href="/index.html" class="sidebar-link active">
+                        <i class='bx  bx-dashboard bx-sm'></i> 
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class='bx  bx-calendar-detail bx-sm'></i>
+                        <span>Predictions</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/dataView.html" class="sidebar-link">
+                        <i class='bx  bx-database bx-sm'></i>  
+                        <span>Data Visualization</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class='bx bxs-bell-ring bx-sm'></i>  
+                        <span>Notifications</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        <div class="main">
+            <div class="grid-container">
+                <div class="card">
+                    <div class="title">Overall current state of the field</div>
+                    <div class="info-fila">
+                        <i class='bx  bx-thermometer'></i> <span>Temperature</span> <strong>25°C</strong>
+                    </div>
+                    <div class="info-fila">
+                        <i class='bx  bx-water-drop'></i> <span>Humidity</span> <strong>60%</strong>
+                    </div>
+                    <div class="info-fila">
+                        <i class='bx  bx-clock-4'></i> <span>Last update</span> <strong>20:56</strong>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="title">Main prediction of the field</div>
+                    <div class="info-fila">
+                        <i class='bx  bx-calendar-star'></i> <span>Next harvest day</span> <strong>Nov 5th</strong>
+                    </div>
+                    <div class="info-fila">
+                        <i class='bx  bx-stopwatch'></i> <span>Countdown</span> <strong>25 days</strong>
+                    </div>
+                    <div class="info-fila">
+                        <i class='bx  bx-badge-exclamation'></i>  <span>Error percentage</span> <strong>5.35%</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-container">
+                <div class="botones-alerta-container">
+                    <div class="card-alerta">
+                        <div class="icon"><i class='bx  bx-alert-triangle bx-lg'></i></div>
+                        <div class="texto">
+                            Sensor out of range<br>
+                            <span id="sensor-id"><strong>Sl4_G</strong></span><br>
+                            <small><em>Notification sent</em></small>
+                        </div>
+                    </div>
+
+                    <div class="botones-card">
+                        <button class="btn"> <i class='bx  bxs-sapling'></i> New plant</button>
+                        <button class="btn"><i class='bx  bxs-plug-connect'></i> New sensor</button>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <title>Average field temperature</title>
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="sidebar-script.js"></script>
+    <script src="temperatureChart-script.js"></script>
+</body>
+</html>
