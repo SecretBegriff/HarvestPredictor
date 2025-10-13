@@ -1,4 +1,3 @@
-// --- Tu código para el menú hamburguesa (déjalo como está) ---
 const hamBurger = document.querySelector(".toggle-btn");
 
 hamBurger.addEventListener("click", function () {
