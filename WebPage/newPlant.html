@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Plant Type</title>
+    <link rel="stylesheet" href="index.css"> 
+    <link rel="stylesheet" href="newPlant.css">
+</head>
+<body>
+    <section class="containerA">
+        <aside class="menuL">
+            <img class="imgMenu" src="imgs/ImgSideBar.png" alt="Logo">
+            <button class="button">Dashboard</button>
+            <button class="button">Predictions</button>
+            <button class="button active">Data visualization</button> 
+        </aside>
+
+        <main class="main-content">
+            <div class="header-section">
+                <a href="#" class="back-arrow">&#8592;</a> 
+                <h1>New plant type</h1>
+            </div>
+
+            <div class="form-container">
+                <form>
+                    <div class="input-group full-width">
+                        <label for="type-name">Type name</label>
+                        <input type="text" id="type-name" placeholder="Escribe el nombre del tipo de planta">
+                    </div>
+
+                    <div class="input-group split-3">
+                        <label for="optimal-humidity">Optimal humidity</label>
+                        <input type="text" id="optimal-humidity" placeholder="Ej: 70%">
+                    </div>
+
+                    <div class="input-group split-3">
+                        <label for="optimal-temperature">Optimal temperature</label>
+                        <input type="text" id="optimal-temperature" placeholder="Ej: 25°C">
+                    </div>
+
+                    <div class="input-group split-3">
+                        <label for="optimal-light">Optimal light</label>
+                        <input type="text" id="optimal-light" placeholder="Ej: 800 Lux">
+                    </div>
+                    
+                    <div class="button-row">
+                         <button type="submit" class="save-button">Save</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </section>
+</body>
+</html>

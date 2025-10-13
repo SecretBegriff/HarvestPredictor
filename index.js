@@ -53,5 +53,6 @@ app.post('/lectura', async (req, res) => {
 
 // --- Iniciar el servidor ---
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor API escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor API escuchando en http://localhost:${PORT}`);
+
 });
