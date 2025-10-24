@@ -92,3 +92,87 @@ body {
     flex-direction: column;
     gap: 10px;
 }
+/* ====== RESPONSIVE CARDS ====== */
+
+/* Tablet (≤ 992px): espacios un poco menores */
+@media (max-width: 992px) {
+  .grid-container {
+    gap: 16px;
+    padding: 16px;
+  }
+  .card {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+  .title {
+    font-size: 1.15em;
+  }
+  .info-fila {
+    padding: 8px 10px;
+  }
+}
+
+/* Móvil (≤ 640px): columnas estrechas, textos y botones cómodos */
+@media (max-width: 640px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .title {
+    font-size: 1.1em;
+  }
+
+  /* Permite que los pares clave/valor bajen de línea sin romper */
+  .info-fila {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .info-fila span {
+    flex: 1 1 140px;   /* cada lado puede ocupar línea completa si falta espacio */
+  }
+
+  /* Botones: quepa bien en pantallas chicas */
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+
+  /* Botonera dentro de cada card: permitir salto de línea */
+  .botones-card {
+    flex-wrap: wrap;
+  }
+}
+
+/* Móvil pequeño (≤ 480px): layout más vertical y legible */
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: 1fr; /* 1 columna segura en teléfonos muy pequeños */
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .card {
+    padding: 12px 14px;
+  }
+
+  /* Alerta: apílala verticalmente */
+  .card-alerta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  /* Botones de alerta en columna (ya tienes column, solo refuerzo) */
+  .botones-alerta-container {
+    width: 100%;
+  }
+
+  /* Botonera general: apilar si no cabe */
+  .botones-card {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
