@@ -1,109 +1,192 @@
-/* newPlant.css */
+/* ===== Paleta (ajústala si tu Figma tiene códigos exactos) ===== */
+:root{
+  --bg: #ffffff;
+  --sidebar-bg: #DFF5CF;     /* verde claro del sidebar */
+  --card-bg: #E5FACC;        /* verde claro del formulario */
+  --input-bg: #D9D9D9;       /* gris de inputs */
+  --primary: #1E7A3B;        /* verde oscuro (textos/iconos) */
+  --primary-weak: #C9F0B2;   /* verde clarito para hover */
+  --cta: #7DDB63;            /* botón Save */
+  --cta-shadow: rgba(62, 148, 68, 0.22);
+  --active-outline: #9B5DE5; /* borde morado del botón activo */
+  --text: #111827;
+  --muted: #374151;
+  --border: #E5E7EB;
+  --radius: 14px;
+  --shadow: 0 10px 24px rgba(0,0,0,.06);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Arial, sans-serif;
 
-/* Colores clave (ajusta si es necesario) */
-:root {
-    --light-green: #e9f7e9; /* El color de fondo claro del formulario */
-    --green: #8bc34a;      /* El color principal del botón 'Save' */
-    --dark-green: #387034; /* Color del texto/ícono de la barra lateral */
-    --gray-input: #f0f0f0; /* Color gris de los campos de entrada */
+  --sidebar-w: 240px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space: 24px;
+  --space-lg: 40px;
 }
 
-/* ---------------------------------------------------- */
-/* Estilos del Header y Contenido Principal */
-/* ---------------------------------------------------- */
-
-.main-content {
-    padding: 30px;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  color:var(--text);
+  background:var(--bg);
 }
 
-.header-section {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
+/* ===== Layout general ===== */
+.containerA{
+  display:flex;
+  min-height:100vh;
 }
 
-.back-arrow {
-    font-size: 2em;
-    color: var(--dark-green);
-    text-decoration: none;
-    margin-right: 15px;
-    padding: 5px 10px; 
-    background-color: var(--light-green);
-    border-radius: 5px;
+/* ===== Sidebar ===== */
+.menuL{
+  width:var(--sidebar-w);
+  background:var(--sidebar-bg);
+  padding: 28px 16px;
+  display:flex;
+  flex-direction:column;
+  gap: 16px;
+  border-right: 1px solid #d6eec6;
+}
+.imgMenu{
+  width:64px; height:64px; object-fit:contain;
+  margin: 4px auto 12px;
+  display:block;
 }
 
-h1 {
-    color: #333; 
-    font-size: 1.8em;
+/* Botones del menú (son <button> en tu HTML) */
+.button{
+  appearance:none;
+  border:2px solid transparent;
+  background:#AEE49A;                 /* tono medio del botón */
+  color:var(--primary);
+  text-align:left;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow: 0 2px 0 rgba(0,0,0,.05);
+  transition: transform .02s ease, filter .15s ease, border-color .15s ease;
+}
+.button:hover{ filter:brightness(.97) }
+.button:active{ transform: translateY(1px) }
+.button.active{
+  border-color: var(--active-outline); /* borde morado visible en Figma */
 }
 
-/* ---------------------------------------------------- */
-/* Estilos del Formulario */
-/* ---------------------------------------------------- */
-
-.form-container {
-    background-color: var(--light-green);
-    padding: 30px;
-    border-radius: 10px;
-    max-width: 800px; 
+/* ===== Main ===== */
+.main-content{
+  flex:1;
+  padding: var(--space-lg);
 }
 
-form {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 20px; 
+/* Header con flecha y título */
+.header-section{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.back-arrow{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px; height:34px;
+  border-radius:10px;
+  text-decoration:none;
+  color: var(--primary);
+  background: #C9F0B2; /* pastilla verde clarita como en Figma */
+  border: 1px solid #bfe7a7;
+}
+h1{
+  margin:0;
+  font-size: 2rem;       /* tamaño grande del Figma */
+  font-weight: 700;
+  letter-spacing: .2px;
 }
 
-.input-group {
-    display: flex;
-    flex-direction: column;
+/* ===== Tarjeta del formulario ===== */
+.form-container{
+  background: var(--card-bg);
+  border: 1px solid #d2efb5;
+  border-radius: 18px;           /* esquinas más redondeadas */
+  padding: 28px;
+  max-width: 980px;
+  box-shadow: var(--shadow);
 }
 
-label {
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 5px;
+/* Grid del formulario */
+form{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 18px 22px; /* row x col */
 }
 
-/* Estilo general para todos los campos de entrada de texto */
-input[type="text"] {
-    border: none;
-    padding: 10px 15px;
-    background-color: var(--gray-input);
-    border-radius: 5px;
-    font-size: 1em;
+.input-group{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
 }
 
-/* Ancho completo para el "Type name" */
-.full-width {
-    width: 100%;
+.full-width{ flex:1 1 100% }
+.split-3{  flex:1 1 280px; max-width:100% }
+
+label{
+  font-weight:600;
+  color: var(--muted);
+  font-size: 0.98rem;
 }
 
-/* División en 3 para los parámetros óptimos */
-.split-3 {
-    flex-basis: calc(33.333% - 15px); 
-    min-width: 150px; 
+/* Inputs como en la imagen (gris, sin borde notorio, redondeados) */
+input[type="text"],
+input[type="number"]{
+  width:100%;
+  border: none;
+  background: var(--input-bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 1rem;
 }
+input::placeholder{ color:#9CA3AF }
 
-/* Estilo del botón "Save" */
-.button-row {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end; 
-    margin-top: 20px;
+/* Botón Save a la derecha, ancho vistoso */
+.button-row{
+  flex:1 1 100%;
+  display:flex;
+  justify-content:flex-end;
+  margin-top: 8px;
 }
-
-.save-button {
-    background-color: var(--green);
-    color: white;
-    border: none;
-    padding: 12px 35px;
-    border-radius: 5px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.save-button{
+  appearance:none;
+  border:none;
+  background: var(--cta);
+  color: #0f4d2a;                 /* texto verde oscuro como en mock */
+  padding: 12px 48px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor:pointer;
+  box-shadow: 0 8px 22px var(--cta-shadow);
+  transition: filter .15s ease, transform .02s ease;
 }
+.save-button:hover{ filter:brightness(.96) }
+.save-button:active{ transform: translateY(1px) }
 
-.save-button:hover {
-    background-color: #6a9c39; 
+/* ===== Responsive ===== */
+@media (max-width: 960px){
+  .main-content{ padding: 28px }
+}
+@media (max-width: 760px){
+  .containerA{ flex-direction:column }
+  .menuL{
+    width:100%;
+    flex-direction:row;
+    align-items:center;
+    gap: 10px;
+  }
+}
+@media (max-width: 560px){
+  .split-3{ flex:1 1 100% }
+  .button-row{ justify-content:stretch }
+  .save-button{ width:100% }
 }

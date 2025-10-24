@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generate Predictions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="sidebar-style.css">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="d-flex align-items-center gap-2 mb-4">
+      <i class="bx bx-magic-wand bx-md"></i>
+      <h1 class="h3 m-0">Generate Predictions</h1>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form id="prediction-form" class="row gy-3">
+          <div class="col-12 col-md-6">
+            <label for="timeDays" class="form-label">Tiempo (días)</label>
+            <input type="number" min="1" step="1" class="form-control" id="timeDays" placeholder="Ej. 25" required>
+            <div class="form-text">Ingresa en cuántos días deseas estimar la cosecha.</div>
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">
+              <i class="bx bx-cog"></i> Run prediction
+            </button>
+            <a href="/index.html" class="btn btn-outline-secondary ms-2">
+              <i class="bx bx-arrow-back"></i> Back to Dashboard
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="result" class="mt-4" style="display: none;">
+      <div class="card border-success">
+        <div class="card-body">
+          <h2 class="h5 mb-3"><i class="bx bx-check-circle"></i> Resultado</h2>
+          <ul class="list-unstyled mb-0">
+            <li><strong>Próxima fecha estimada de cosecha:</strong> <span id="predDate"></span></li>
+            <li><strong>Error esperado:</strong> <span id="predError"></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Stub rápido: aquí conectarías tu API/modelo real
+    function computePrediction(days) {
+      const now = new Date();
+      const target = new Date(now);
+      target.setDate(now.getDate() + Number(days));
+
+      // Simulación de error (puedes reemplazar por lo que devuelva el modelo)
+      const errorPct = (Math.random() * 3 + 3).toFixed(2); // 3% - 6%
+
+      return { date: target, errorPct };
+    }
+
+    function formatDate(d) {
+      // Formato corto legible (ej: Nov 5, 2025)
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    document.getElementById('prediction-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const days = document.getElementById('timeDays').value;
+
+      if (!days || Number(days) < 1) {
+        alert('Ingresa un número de días válido (>= 1).');
+        return;
+      }
+
+      // Aquí podrías hacer fetch a tu backend:
+      // const res = await fetch('/api/predict', { method:'POST', body: JSON.stringify({ days }) })
+      // const data = await res.json();
+
+      const { date, errorPct } = computePrediction(days);
+
+      document.getElementById('predDate').textContent = formatDate(date);
+      document.getElementById('predError').textContent = `${errorPct}%`;
+      document.getElementById('result').style.display = 'block';
+    });
+  </script>
+</body>
+</html>

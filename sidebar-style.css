@@ -116,3 +116,73 @@ a.sidebar-link.active {
 .sidebar-item {
     position: relative;
 }
+
+/* ====== RESPONSIVE SIDEBAR ====== */
+
+/* Tablet (≤ 992px): sidebar un poco más angosto y paddings menores */
+@media (max-width: 992px) {
+  #sidebar { width: 80px; min-width: 80px; }
+  #sidebar.expand { width: 220px; min-width: 220px; }
+
+  a.sidebar-link { padding: .5rem 1rem; }
+  .sidebar-link i { font-size: 1rem; }
+
+  /* Corrige flex de la nav sin tocar tu regla original */
+  .sidebar-nav { flex: 1 1 auto; }
+}
+
+/* Móvil (≤ 640px): sidebar como barra superior con scroll horizontal si hace falta */
+@media (max-width: 640px) {
+  .wrapper { flex-direction: column; }
+
+  #sidebar {
+    width: 100%;
+    min-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+  }
+
+  .toggle-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    border: none;
+    margin-left: 4px;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    gap: 8px;
+    padding: 0;
+    margin: 0 0 0 10px;
+    overflow-x: auto;       /* permite deslizar opciones si no caben */
+    white-space: nowrap;
+    flex: 1 1 auto;         /* ocupa el ancho restante */
+  }
+
+  .sidebar-item { display: inline-flex; }
+
+  a.sidebar-link {
+    padding: 10px 12px;
+    border-left: 0;         /* sin barra lateral en móvil */
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+
+  .sidebar-link i {
+    font-size: 1.1rem;
+    margin-right: .5rem;
+  }
+
+  .main {
+    width: 100%;
+    overflow: visible;      /* evita recortes del contenido en móvil */
+  }
+}
+
+/* Móvil pequeño (≤ 480px): aún más compacto */
+@media (max-width: 480px) {
+  a.sidebar-link { padding: 8px 10px; font-size: .95rem; }
+  .sidebar-link i { font-size: 1rem; margin-right: .4rem; }
+}
