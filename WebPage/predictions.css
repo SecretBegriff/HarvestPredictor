@@ -28,8 +28,8 @@ li {
 }
 
 #sidebar {
-    width: 90px;
-    min-width: 90px;
+    width: 90px;        /* ↑ antes: 90px */
+    min-width: 90px;    /* ↑ antes: 90px */
     transition: all 0.25s ease-in-out;
     background-color: #DEFFC5;
     display: flex;
@@ -42,8 +42,8 @@ li {
 }
 
 #sidebar.expand {
-    width: 260px;
-    min-width: 260px;
+    width: 300px;        /* ↑ antes: 260px */
+    min-width: 300px;    /* ↑ antes: 260px */
 }
 
 .toggle-btn {
@@ -91,16 +91,17 @@ li {
 }
 
 a.sidebar-link {
-    padding: .625rem 1.625rem;
+    padding: 0.9rem 1.625rem; /* ↑ antes: .625rem 1.625rem */
     color: #005813;
     display: block;
     white-space: nowrap;
     font-weight: 700;
     border-left: 3px solid transparent;
+    font-size: 1.15rem;       /* ← añadido para texto más grande */
 }
 
 .sidebar-link i {
-    font-size: 1.1rem;
+    font-size: 1.5rem;  /* ↑ antes: 1.1rem */
     margin-right: .75rem;
 }
 
@@ -141,4 +142,12 @@ a.sidebar-link.active {
     margin-top: 0;
     font-size: 20px;
     color: #333;
+}
+
+/*Diseño mobil*/
+@media screen and (max-width: 480px){
+    .main-content{
+        display: flex;
+        flex-direction: column;
+    }
 }
