@@ -87,6 +87,13 @@ body {
     margin-top: 10px;
 }
 
+.botones-card2 {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    width: 50%;
+}
+
 .botones-alerta-container {
     display: flex;
     flex-direction: column;
