@@ -1,0 +1,134 @@
+/* predictions-style.css */
+/* Paleta y tokens (ajústalos si tu tema principal cambia) */
+:root{
+  --brand-text: #234625;            /* verde oscuro para textos */
+  --brand-primary: #7ED957;         /* verde fuerte (headers) */
+  --brand-primary-100: #E8F8D8;     /* fondo muy claro */
+  --brand-primary-200: #CFF2B1;     /* filas/áreas claras */
+  --brand-primary-300: #B9EB91;     /* tarjetas */
+  --brand-primary-400: #A5E887;     /* botones claros */
+  --brand-shadow: rgba(0,0,0,.08);
+  --radius-xl: 20px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+}
+body{
+  font-family:'Outfit', sans-serif;
+  background: var(--brand-primary-100);
+  color: var(--brand-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Título y layout */
+.page-wrap{
+  max-width: 980px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+.page-title{
+  display:flex; align-items:center; gap:12px;
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 800;
+  color: var(--brand-text);
+}
+
+/* Card base (coincide con el dashboard) */
+.card{
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: var(--brand-primary-300);
+  box-shadow: 0 8px 18px var(--brand-shadow);
+  overflow: hidden;
+}
+
+.card .card-body{
+  padding: 20px;
+}
+
+/* Header estilo “banda” */
+.card-header{
+  background: var(--brand-primary);
+  color: #143618;
+  font-weight: 700;
+  border-bottom: 0;
+  padding: 14px 20px;
+  font-size: 18px;
+}
+
+/* Secciones internas con pastillas claras */
+.section{
+  background: var(--brand-primary-200);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+/* Formularios */
+.form-label{
+  font-weight: 600;
+  color: #1f3b20;
+  margin-bottom: 6px;
+}
+.form-control{
+  border: 0;
+  outline: 0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+}
+.form-text{ color:#3b5b3d }
+
+/* Botones – mismos radios y tonos pastel que el dashboard */
+.btn{
+  border-radius: 16px;
+  padding: 10px 14px;
+  font-weight: 600;
+  border: 0;
+  box-shadow: 0 6px 12px var(--brand-shadow);
+  transition: transform .06s ease, filter .18s ease;
+}
+.btn:active{ transform: translateY(1px) }
+
+.btn-primary{
+  background: var(--brand-primary);
+  color: #113015;
+}
+.btn-primary:hover{ filter: brightness(0.96) }
+
+.btn-outline-secondary{
+  background: var(--brand-primary-400);
+  color: #163e1b;
+}
+.btn-outline-secondary:hover{ filter: brightness(0.97) }
+
+/* Bloque de resultado (verde éxito, uniforme con tarjetas) */
+.result-card{
+  border: 2px solid rgba(22, 113, 37, 0.18);
+  background: #ECFAE4;
+}
+
+/* “List rows” como en las cajas del tablero */
+.kv{
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--brand-primary-200);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.kv small{ font-weight:400; opacity:.85 }
+
+/* Utilidades */
+.mt-24{ margin-top:24px }
+.grid-2{
+  display:grid; gap:16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px){
+  .grid-2{ grid-template-columns: 1fr 1fr; }
+}
