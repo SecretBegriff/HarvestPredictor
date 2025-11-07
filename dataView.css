@@ -231,23 +231,16 @@ button {
   background-color: white;
 }
 
-
-/* --- ESTILOS DE PAGINACIÓN --- */
-
-/* 1. Oculta todas las filas de datos dentro de .data-body por defecto */
 .data-container .data-body .data-row {
     display: none;
 }
 
-/* 2. Esta clase 'visible' la usará JavaScript para mostrar las 5 filas correctas. */
-/* ¡IMPORTANTE! Debes copiar aquí el 'display' y 'grid-template-columns' 
-   que estés usando actualmente para que tus .data-row se vean bien. */
 .data-container .data-body .data-row.visible {
     display: grid;  
     grid-template-columns: 1fr 1fr 1fr 1fr 1.5fr 1fr; 
     align-items: center;
-    padding: 1rem 1.5rem; /* Ajusta esto a tu diseño */
-    border-bottom: 1px solid #eee; /* Ajusta esto a tu diseño */
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
     text-align: center;
 }
 
@@ -259,7 +252,6 @@ button {
   background-color: #f5f5f5;
 }
 
-/* 3. Estilos para el contenedor de los botones de paginación */
 .pagination-controls {
     display: flex;
     justify-content: center;
@@ -267,9 +259,22 @@ button {
     padding: 1rem 0;
 }
 
-/* 4. Estilo para el botón de la página activa (usando tus colores) */
 .pagination-controls button.active {
     background-color: #005813;
     border-color: #005813;
     color: white;
 }
+
+/* =========================================
+          MEDIA QUERIES RESPONSIVE
+   ========================================= */
+
+/* Móvil (≤ 640px) */
+@media (max-width: 640px) {
+
+  .plant-titles,
+  .plant-body {
+    width: 100%;    
+    float: none;      
+    margin-bottom: 20px; 
+  }
