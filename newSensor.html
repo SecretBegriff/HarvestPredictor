@@ -31,7 +31,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
+                    <a href="WebPage/predictions.html" class="sidebar-link">
                         <i class='bx  bx-calendar-detail'></i>
                         <span>Predictions</span>
                     </a>
@@ -75,39 +75,16 @@
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button type="button" class="btn btn-secondary me-md-2" onclick="window.location.href='index.html';">Cancel</button>
-    <button type="submit" class="btn btn-primary">Save Plant</button>
-</div>
+                        <button type="button" class="btn btn-secondary me-md-2" onclick="window.location.href='index.html';">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Sensor</button>
+                    </div>
                 </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Nueva Ubicación -->
-    <div class="location-modal" id="locationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New location</h5>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="locationName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="locationName" placeholder="Enter location name">
-                </div>
-                <div class="mb-3">
-                    <label for="locationDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="locationDescription" rows="3" placeholder="Enter location description"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="closeLocationModal">Cancel</button>
-                <button type="button" class="btn btn-save" id="saveLocation">Save</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="sidebar-script.js"></script>
-    <script src="newLocation.js"></script>
+    <script src="newSensor.js"></script>
 </body>
 </html>
