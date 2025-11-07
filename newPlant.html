@@ -1,3 +1,4 @@
+<?php include ("funciones.php")?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,9 +49,8 @@
             <div class="form-container">
                 <h1 class="form-header">New Plant</h1>
                 
-                <form>
+                <form method="POST" action="/newPlant_action.php" name="formNewPlant" id="formNewPlant">
                     <div class="form-section">
-                        
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="plantName" class="form-label">Name</label>
@@ -61,43 +61,32 @@
                                 <i class='bx bx-plus' style="color: red; cursor: pointer;"></i>
                                 <select class="form-select" id="plantType">
                                     <option selected disabled>Select plant type</option>
-                                    <option value="tomato">Tomato</option>
-                                    <option value="lettuce">Lettuce</option>
-                                    <option value="cucumber">Cucumber</option>
-                                    <option value="pepper">Pepper</option>
-                                    <option value="other">Other</option>
+                                    <?php
+                                        $plantTypes = getListaPlanTypes();
+                                        foreach ($plantTypes as $type) {
+                                            echo "<option value='{$type['name']}'>{$type['name']}</option>";
+                                        }
+                                    ?>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="plantLocation" class="form-label">Location</label>
-                                <i class='bx bx-plus' style="color: red; cursor: pointer;" id="openLocationModal"></i>
-                                <select class="form-select" id="plantLocation">
-                                    <option selected disabled>Select location</option>
-                                    <option value="greenhouse1">Greenhouse #001</option>
-                                    <option value="greenhouse2">Greenhouse #002</option>
-                                    <option value="field1">Field #001</option>
-                                    <option value="field2">Field #002</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
                                 <label for="plantingDate" class="form-label">Planting Date</label>
                                 <input type="date" class="form-control" id="plantingDate">
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="assignedSensor" class="form-label">Assigned Sensor</label>
-                            <i class='bx bx-plus' style="color: red; cursor: pointer;"></i>
-                            <select class="form-select" id="assignedSensor">
-                                <option selected disabled>Select a sensor</option>
-                                <option value="sensor1">Sensor #001</option>
-                                <option value="sensor2">Sensor #002</option>
-                                <option value="sensor3">Sensor #003</option>
-                                <option value="sensor4">Sensor #004</option>
-                            </select>
+                            <div class="col-md-6">
+                                <label for="assignedSensor" class="form-label">Assigned Sensor</label>
+                                <i class='bx bx-plus' style="color: red; cursor: pointer;"></i>
+                                <select class="form-select" id="assignedSensor">
+                                    <option selected disabled>Select a sensor</option>
+                                    <option value="sensor1">Sensor #001</option>
+                                    <option value="sensor2">Sensor #002</option>
+                                    <option value="sensor3">Sensor #003</option>
+                                    <option value="sensor4">Sensor #004</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
