@@ -9,7 +9,6 @@ async function loadDashboardData() {
         
         if (result.status === 'success') {
             updateDashboardCards(result.data);
-            updateTemperatureChart(result.data);
         } else {
             console.error('Error en la respuesta del servidor:', result.message);
         }
@@ -130,20 +129,8 @@ function formatDateTime(date) {
 function formatDate(date) {
     return date.toLocaleDateString('en-US', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
     });
-}
-
-// Función para actualizar el gráfico con datos reales
-function updateTemperatureChart(data) {
-    // Esta función se integrará con tu chart existente
-    console.log('Datos para el gráfico:', data);
-    
-    // Si tienes datos históricos, puedes actualizar el gráfico aquí
-    if (data && data.length > 0 && window.updateChartWithRealData) {
-        // Llamar a la función del gráfico si existe
-        window.updateChartWithRealData(data);
-    }
 }
 
 // Cargar datos cuando la página se abra

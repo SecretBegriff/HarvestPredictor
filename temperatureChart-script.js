@@ -1,12 +1,10 @@
-// temperatureChart-script.js - Versión actualizada con datos reales
 let temperatureChart = null;
-const PYTHON_BACKEND = 'http://localhost:5000/api/python';
 
 // Inicializar gráfica
 function initializeTemperatureChart() {
     const ctx = document.getElementById('temperatureChart').getContext('2d');
     
-    // Datos por defecto (se actualizarán con datos reales)
+    // Datos por defecto
     const defaultData = {
         labels: ['Loading...'],
         datasets: [{
@@ -94,7 +92,6 @@ function initializeTemperatureChart() {
         }
     });
 
-    // Cargar datos reales inmediatamente
     loadHistoricalData();
 }
 
@@ -373,22 +370,11 @@ function updateChartWithRealTimeData(sensorData) {
     // Por ahora, recargamos todos los datos históricos
     loadHistoricalData();
 }
-
-// Función para forzar actualización de la gráfica
-window.refreshTemperatureChart = function() {
-    console.log('Actualizando gráfica de temperatura...');
-    loadHistoricalData();
-};
-
 // Inicializar cuando se cargue la página
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Inicializando gráfica de temperatura...');
     initializeTemperatureChart();
-    
-    // Actualizar cada 5 minutos
-    setInterval(loadHistoricalData, 300000);
 });
 
 // Hacer funciones globales para acceso externo
-window.updateChartWithRealData = updateChartWithHistoricalData;
 window.loadHistoricalData = loadHistoricalData;
