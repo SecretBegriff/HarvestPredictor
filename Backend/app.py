@@ -73,33 +73,30 @@ def get_dashboard_data():
             sr.reading_timestamp,
             pt.optimal_temp,
             pt.optimal_humidity
-        FROM plants p
+        FROM sensor_reading sr
+        JOIN plants p ON sr.plant_id = p.id
         JOIN plant_types pt ON p.plant_type_id = pt.id
-        LEFT JOIN sensor_reading sr ON p.id = sr.plant_id
         WHERE sr.reading_timestamp = (
             SELECT MAX(reading_timestamp) 
-            FROM sensor_reading 
-            WHERE plant_id = p.id
+            FROM sensor_reading
         )
-        ORDER BY p.id
+        ORDER BY sr.reading_timestamp DESC
+        LIMIT 1
         """
         cursor.execute(query)
         results = cursor.fetchall()
         
-        # Si no hay datos, devolver datos de ejemplo de plant_types
+        # Si todavía no hay datos, devolver datos de ejemplo
         if not results:
-            cursor.execute("SELECT * FROM plant_types LIMIT 1")
-            plant_type = cursor.fetchone()
-            if plant_type:
-                results = [{
-                    'plant_id': 1,
-                    'plant_type_name': plant_type['name'],
-                    'temperature': 25.0,
-                    'humidity': 60.0,
-                    'reading_timestamp': datetime.now(),
-                    'optimal_temp': plant_type['optimal_temp'],
-                    'optimal_humidity': plant_type['optimal_humidity']
-                }]
+            results = [{
+                'plant_id': 1,
+                'plant_type_name': 'Default Plant',
+                'temperature': 25.0,
+                'humidity': 60.0,
+                'reading_timestamp': datetime.now(),
+                'optimal_temp': 25.0,
+                'optimal_humidity': 60.0
+            }]
         
         # Convertir datetime a string para JSON
         for result in results:
@@ -111,7 +108,8 @@ def get_dashboard_data():
         
         return jsonify({
             'status': 'success',
-            'data': results
+            'data': results,
+            'total_plants': len(results)
         })
     
     except Exception as e:

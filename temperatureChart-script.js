@@ -12,8 +12,6 @@ function initializeTemperatureChart() {
         datasets: [{
             label: 'Temperature (°C)',
             data: [0],
-            backgroundColor: '#E99449',
-            borderColor: '#D17A29',
             borderWidth: 2,
             borderRadius: 6,
             barPercentage: 0.8,
@@ -42,7 +40,7 @@ function initializeTemperatureChart() {
                         }
                     },
                     grid: {
-                        color: '#DCE8F2'
+                        color: undefined
                     },
                     ticks: {
                         callback: function(value) {
@@ -144,8 +142,6 @@ function updateChartWithHistoricalData(historicalData) {
     const temperatureDataset = {
         label: 'Temperature (°C)',
         data: temperatures,
-        backgroundColor: '#E99449',
-        borderColor: '#D17A29',
         borderWidth: 2,
         borderRadius: 6,
         barPercentage: 0.8,
@@ -158,11 +154,7 @@ function updateChartWithHistoricalData(historicalData) {
         label: 'Humidity (%)',
         data: humidities,
         type: 'line',
-        borderColor: '#4A90E2',
-        backgroundColor: 'rgba(74, 144, 226, 0.1)',
         borderWidth: 3,
-        pointBackgroundColor: '#4A90E2',
-        pointBorderColor: '#FFFFFF',
         pointBorderWidth: 2,
         pointRadius: 5,
         pointHoverRadius: 7,
@@ -254,8 +246,8 @@ function showDefaultChartData() {
         datasets: [{
             label: 'Temperature (°C) - Example Data',
             data: temperatures,
-            backgroundColor: '#E99449',
-            borderColor: '#D17A29',
+            backgroundColor: undefined,
+            borderColor: undefined,
             borderWidth: 2,
             borderRadius: 6,
             barPercentage: 0.8,
@@ -291,7 +283,7 @@ function initializeTemperatureChartWithData(chartData) {
                         }
                     },
                     grid: {
-                        color: '#DCE8F2'
+                        color: undefined
                     },
                     ticks: {
                         callback: function(value) {

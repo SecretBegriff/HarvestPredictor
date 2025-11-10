@@ -4,21 +4,14 @@ const PYTHON_BACKEND = 'http://localhost:5000/api/python';
 // Función para cargar datos en tiempo real del dashboard
 async function loadDashboardData() {
     try {
-        console.log('Intentando conectar con el backend...');
-        const response = await fetch(`${PYTHON_BACKEND}/dashboard-data`);
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
-        
+        const response = await fetch(`${PYTHON_BACKEND}/dashboard-data`);       
         const result = await response.json();
-        console.log('Respuesta del backend:', result);
         
         if (result.status === 'success') {
             updateDashboardCards(result.data);
             updateTemperatureChart(result.data);
         } else {
             console.error('Error en la respuesta del servidor:', result.message);
-            showDefaultData();
         }
     } catch (error) {
         console.error('Error cargando datos:', error);
@@ -40,58 +33,26 @@ function updateDashboardCards(data) {
         const humidityElement = document.querySelector('#dash_humidity strong');
         const lastUpdateElement = document.querySelector('#dash_last_update strong');
         
-        // Actualizar temperatura - con verificación más robusta
-        if (tempElement) {
-            const temperature = latestData.temperature;
-            if (temperature !== null && temperature !== undefined && !isNaN(temperature)) {
-                tempElement.textContent = `${temperature}°C`;
-                console.log('Temperatura actualizada:', temperature);
-            } else {
-                tempElement.textContent = 'N/A';
-                console.log('Temperatura no disponible o inválida:', temperature);
-            }
-        } else {
-            console.log('No se encontró el elemento #dash_temp strong');
+        if (tempElement && latestData.temperature !== null) {
+            tempElement.textContent = `${latestData.temperature}°C`;
         }
         
-        // Actualizar humedad - con verificación más robusta
-        if (humidityElement) {
-            const humidity = latestData.humidity;
-            if (humidity !== null && humidity !== undefined && !isNaN(humidity)) {
-                humidityElement.textContent = `${humidity}%`;
-                console.log('Humedad actualizada:', humidity);
-            } else {
-                humidityElement.textContent = 'N/A';
-                console.log('Humedad no disponible o inválida:', humidity);
-            }
-        } else {
-            console.log('No se encontró el elemento #dash_humidity strong');
+        if (humidityElement && latestData.humidity !== null) {
+            humidityElement.textContent = `${latestData.humidity}%`;
         }
         
-        // Actualizar última actualización
         if (lastUpdateElement) {
             let timestampText;
             if (latestData.reading_timestamp) {
-                try {
-                    // Formatear el timestamp del sensor
-                    const sensorTime = new Date(latestData.reading_timestamp);
-                    timestampText = formatDateTime(sensorTime);
-                    console.log('Timestamp del sensor:', timestampText);
-                } catch (error) {
-                    console.error('Error formateando timestamp:', error);
-                    timestampText = formatDateTime(new Date());
-                }
+                // Formatear el timestamp del sensor
+                const sensorTime = new Date(latestData.reading_timestamp);
+                timestampText = formatDateTime(sensorTime);
             } else {
                 // Usar hora actual si no hay timestamp
                 timestampText = formatDateTime(new Date());
-                console.log('Usando timestamp actual');
             }
             lastUpdateElement.textContent = timestampText;
-        } else {
-            console.log('No se encontró el elemento #dash_last_update strong');
         }
-        
-        console.log('Tarjetas actualizadas correctamente');
         
         // Actualizar también la tarjeta de predicciones si hay datos
         updatePredictionCard(data);
@@ -105,7 +66,6 @@ function updateDashboardCards(data) {
 // Función para actualizar la tarjeta de predicciones
 function updatePredictionCard(data) {
     // Por ahora mostramos datos estáticos
-    // En el Sprint 3 implementarás la lógica de predicción real
     
     const nextHarvestElement = document.querySelector('#dash_next_harvest strong');
     const countdownElement = document.querySelector('#dash_countdown strong');
