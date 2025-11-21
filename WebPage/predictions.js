@@ -109,3 +109,60 @@ function renderDashChart(labels, values) {
         }
     });
 }
+// ... (Todo tu código anterior de cargarDashboard sigue igual) ...
+
+// FUNCIÓN PARA DESCARGAR PDF
+async function descargarPDF() {
+    const { jsPDF } = window.jspdf;
+    
+    // 1. Seleccionamos qué parte de la pantalla queremos capturar
+    // Usamos '.row.g-4' que es el contenedor de tus 4 tarjetas
+    const elementoParaCapturar = document.querySelector('.container.page-wrap');
+
+    // Botón para feedback visual (opcional)
+    const btn = document.querySelector('button[onclick="descargarPDF()"]');
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Generando...";
+
+    try {
+        // 2. Creamos la "foto" (canvas)
+        const canvas = await html2canvas(elementoParaCapturar, {
+            scale: 2, // Mejora la resolución (calidad)
+            useCORS: true, // Ayuda si hay imágenes externas
+            backgroundColor: '#E8F8D8' // Asegura que el fondo salga verde y no negro/blanco
+        });
+
+        // 3. Preparamos el PDF
+        const imgData = canvas.toDataURL('image/png');
+        
+        // A4 vertical (portrait)
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        // Ajustar la imagen al ancho del PDF
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        // Margen superior
+        const marginTop = 20; 
+
+        // 4. Agregamos título y la imagen
+        pdf.setFontSize(18);
+        pdf.text("Reporte de Predicciones de Cosecha", 15, 15);
+        
+        // (imagen, formato, x, y, ancho, alto)
+        pdf.addImage(imgData, 'PNG', 0, marginTop, pdfWidth, imgHeight);
+
+        // 5. Descargar
+        pdf.save('Reporte_Predicciones.pdf');
+
+    } catch (err) {
+        console.error("Error al generar PDF:", err);
+        alert("Hubo un error al generar el PDF.");
+    } finally {
+        // Restaurar botón
+        btn.innerHTML = textoOriginal;
+    }
+}
