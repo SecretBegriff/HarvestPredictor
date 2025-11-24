@@ -1,5 +1,6 @@
 // URL base del backend Python
 const PYTHON_BACKEND = 'http://localhost:5000/api/python';
+const VERTEX_AI_URL = 'https://mint-predictor-541521882439.us-central1.run.app';
 
 // Función para cargar datos en tiempo real del dashboard
 async function loadDashboardData() {
@@ -9,6 +10,7 @@ async function loadDashboardData() {
         
         if (result.status === 'success') {
             updateDashboardCards(result.data);
+            loadPredictions(result.data);
         } else {
             console.error('Error en la respuesta del servidor:', result.message);
         }
@@ -18,6 +20,87 @@ async function loadDashboardData() {
         showDefaultData();
     }
 }
+
+// Función para cargar predicciones usando Cloud Run
+async function loadPredictions(dashboardData) {
+    try {
+        if (!dashboardData || dashboardData.length === 0) {
+            showDefaultPredictions();
+            return;
+        }
+
+        // Tomar los datos más recientes del dashboard
+        const latestData = dashboardData[0];
+        
+        // Preparar payload para Vertex AI (similar a generatePredictions.js)
+        const temperature = Number(latestData.temperature) || 20;
+        const humidity = Number(latestData.humidity) || 60;
+        const plantName = latestData.plant_type_name || "mint";
+
+        const now = new Date();
+        const readingTimestamp = now.toISOString().slice(0, 19).replace('T', ' ');
+
+        const vertexPayload = {
+            plant_id: latestData.plant_id?.toString() || "1",
+            crop_type: plantName,
+            reading_timestamp: readingTimestamp,
+            temperature_c: temperature,
+            humidity_pct: humidity,
+            day_of_cycle: 10
+        };
+
+        // Llamar a Cloud Run para obtener predicciones
+        const vertexResponse = await fetch(VERTEX_AI_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(vertexPayload)
+        });
+
+        if (!vertexResponse.ok) {
+            throw new Error('Error en servicio de Vertex/Cloud Run');
+        }
+
+        const vertexData = await vertexResponse.json();
+
+        // Actualizar la tarjeta de predicciones con los datos de Vertex AI
+        updatePredictionCard(vertexData, plantName);
+
+    } catch (error) {
+        console.error('Error cargando predicciones:', error);
+        // En caso de error, usar datos por defecto basados en la planta
+        loadFallbackPredictions(dashboardData);
+    }
+}
+
+// Función de respaldo si Cloud Run falla
+async function loadFallbackPredictions(dashboardData) {
+    try {
+        const latestData = dashboardData[0];
+        const plantName = latestData.plant_type_name || "mint";
+        
+        // Llamar al endpoint local para predicciones básicas
+        const response = await fetch(`${PYTHON_BACKEND}/fallback-predictions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                plant: plantName,
+                temperature: latestData.temperature,
+                humidity: latestData.humidity
+            })
+        });
+
+        if (response.ok) {
+            const fallbackData = await response.json();
+            updatePredictionCard(fallbackData, plantName);
+        } else {
+            showDefaultPredictions();
+        }
+    } catch (error) {
+        console.error('Error cargando predicciones de respaldo:', error);
+        showDefaultPredictions();
+    }
+}
+
 
 // Función para actualizar las tarjetas con datos reales
 function updateDashboardCards(data) {
@@ -62,27 +145,72 @@ function updateDashboardCards(data) {
     }
 }
 
-// Función para actualizar la tarjeta de predicciones
-function updatePredictionCard(data) {
-    // Por ahora mostramos datos estáticos
-    
+// Función para actualizar la tarjeta de predicciones con datos reales
+function updatePredictionCard(predictionData, plantName) {
     const nextHarvestElement = document.querySelector('#dash_next_harvest strong');
     const countdownElement = document.querySelector('#dash_countdown strong');
-    const errorElement = document.querySelector('#dash_error strong');
+
+    if (!nextHarvestElement || !countdownElement) {
+        console.error('Elementos de predicción no encontrados en el DOM');
+        return;
+    }
     
-    if (nextHarvestElement) {
-        // Ejemplo: calcular fecha de cosecha basada en fecha de plantación + 90 días
+    if (predictionData && predictionData.days_to_harvest !== undefined) {
+        const daysToHarvest = parseFloat(predictionData.days_to_harvest);
+        
+        // Calcular fecha de cosecha
         const harvestDate = new Date();
-        harvestDate.setDate(harvestDate.getDate() + 25);
-        nextHarvestElement.textContent = formatDate(harvestDate);
+        harvestDate.setDate(harvestDate.getDate() + daysToHarvest);
+        
+        // Actualizar next harvest day
+        if (nextHarvestElement) {
+            nextHarvestElement.textContent = formatDate(harvestDate);
+        }
+        
+        // Actualizar countdown
+        if (countdownElement) {
+            if (daysToHarvest === 1) {
+                countdownElement.textContent = '1 day';
+            } else if (daysToHarvest > 1) {
+                countdownElement.textContent = `${Math.ceil(daysToHarvest)} days`;
+            } else if (daysToHarvest === 0) {
+                countdownElement.textContent = 'Today!';
+            } else {
+                countdownElement.textContent = 'Ready to harvest!';
+            }
+        }
+        
+        console.log(`Predicción actualizada: ${daysToHarvest} días para cosecha de ${plantName}`);
+        
+    } else {
+        // Si no hay datos de predicción, mostrar valores por defecto
+        showDefaultPredictions();
     }
+}
+
+// Función para mostrar predicciones por defecto
+function showDefaultPredictions() {
+    const nextHarvestElement = document.querySelector('#dash_next_harvest strong');
+    const countdownElement = document.querySelector('#dash_countdown strong');
     
-    if (countdownElement) {
-        countdownElement.textContent = '25 days';
-    }
+    // Fecha por defecto: 25 días desde hoy
+    const defaultHarvestDate = new Date();
+    defaultHarvestDate.setDate(defaultHarvestDate.getDate() + 25);
     
-    if (errorElement) {
-        errorElement.textContent = '5.35%';
+    if (nextHarvestElement) nextHarvestElement.textContent = formatDate(defaultHarvestDate);
+    if (countdownElement) countdownElement.textContent = '25 days';
+}
+
+// Función para mostrar datos por defecto cuando hay error
+function showDefaultData() {
+    const tempElement = document.querySelector('#dash_temp strong');
+    const humidityElement = document.querySelector('#dash_humidity strong');
+    const lastUpdateElement = document.querySelector('#dash_last_update strong');
+    
+    if (tempElement) tempElement.textContent = '25°C';
+    if (humidityElement) humidityElement.textContent = '60%';
+    if (lastUpdateElement) {
+        lastUpdateElement.textContent = formatDateTime(new Date());
     }
 }
 
@@ -130,6 +258,7 @@ function formatDate(date) {
     return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
+        year: 'numeric'
     });
 }
 

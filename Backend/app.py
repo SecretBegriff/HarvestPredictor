@@ -729,6 +729,73 @@ def update_plant(plant_id):
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+# Ruta para predicciones de respaldo
+@app.route('/api/python/fallback-predictions', methods=['POST'])
+def fallback_predictions():
+    try:
+        data = request.get_json()
+        plant_name = data.get('plant', 'mint')
+        temperature = data.get('temperature', 25.0)
+        humidity = data.get('humidity', 60.0)
+        
+        # Lógica de predicción simple basada en condiciones actuales
+        # Puedes ajustar estos valores según tus necesidades
+        
+        # Días base por tipo de planta
+        base_days = {
+            'mint': 60,
+            'tomato': 80,
+            'lettuce': 45,
+            'basil': 50,
+            'default': 60
+        }
+        
+        base_yield = {
+            'mint': 500,
+            'tomato': 800,
+            'lettuce': 300,
+            'basil': 400,
+            'default': 450
+        }
+        
+        days_base = base_days.get(plant_name.lower(), base_days['default'])
+        yield_base = base_yield.get(plant_name.lower(), base_yield['default'])
+        
+        # Ajustar basado en temperatura (óptimo: 20-25°C)
+        temp_factor = 1.0
+        if temperature < 18:
+            temp_factor = 1.3  # Toma más tiempo si hace frío
+        elif temperature < 20:
+            temp_factor = 1.1
+        elif temperature > 30:
+            temp_factor = 1.2  # Toma más tiempo si hace mucho calor
+        elif temperature > 28:
+            temp_factor = 1.1
+        
+        # Ajustar basado en humedad (óptimo: 60-80%)
+        humidity_factor = 1.0
+        if humidity < 40:
+            humidity_factor = 1.25  # Toma más tiempo si está seco
+        elif humidity < 50:
+            humidity_factor = 1.1
+        elif humidity > 85:
+            humidity_factor = 1.15  # Toma más tiempo si está muy húmedo
+        elif humidity > 80:
+            humidity_factor = 1.05
+        
+        predicted_days = days_base * temp_factor * humidity_factor
+        predicted_yield = yield_base * (25 / max(15, min(temperature, 30)))
+        
+        return jsonify({
+            'status': 'success',
+            'days_to_harvest': round(predicted_days, 1),
+            'yield_g': round(predicted_yield, 1),
+            'plant_name': plant_name
+        })
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 if __name__ == '__main__':
     print("=== Harvest Predictor Backend ===")
     print("Iniciando servidor en http://localhost:5000")
