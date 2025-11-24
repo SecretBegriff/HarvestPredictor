@@ -179,23 +179,64 @@ def create_plant():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# Ruta para crear nuevo tipo de planta
+# Ruta para crear nuevo tipo de planta (ACTUALIZADA)
 @app.route('/api/python/plant-types', methods=['POST'])
 def create_plant_type():
     try:
         data = request.json
         name = data.get('name')
-        optimal_temp = data.get('optimal_temp')
-        optimal_humidity = data.get('optimal_humidity')
+        optimal_temp_min = data.get('optimal_temp_min')
+        optimal_temp_max = data.get('optimal_temp_max')
+        optimal_humidity_min = data.get('optimal_humidity_min')
+        optimal_humidity_max = data.get('optimal_humidity_max')
+        harvest_days = data.get('harvest_days')
         
-        if not all([name, optimal_temp, optimal_humidity]):
-            return jsonify({'status': 'error', 'message': 'Faltan datos requeridos'}), 400
+        # Validar que todos los campos requeridos estén presentes
+        required_fields = ['name', 'optimal_temp_min', 'optimal_temp_max', 
+                          'optimal_humidity_min', 'optimal_humidity_max', 'harvest_days']
+        
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        if missing_fields:
+            return jsonify({
+                'status': 'error', 
+                'message': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+        
+        # Validaciones adicionales
+        if optimal_temp_min >= optimal_temp_max:
+            return jsonify({
+                'status': 'error',
+                'message': 'Minimum temperature must be less than maximum temperature'
+            }), 400
+            
+        if optimal_humidity_min >= optimal_humidity_max:
+            return jsonify({
+                'status': 'error',
+                'message': 'Minimum humidity must be less than maximum humidity'
+            }), 400
+            
+        if harvest_days <= 0:
+            return jsonify({
+                'status': 'error',
+                'message': 'Harvest days must be greater than 0'
+            }), 400
         
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        query = "INSERT INTO plant_types (name, optimal_temp, optimal_humidity) VALUES (%s, %s, %s)"
-        cursor.execute(query, (name, optimal_temp, optimal_humidity))
+        query = """
+        INSERT INTO plant_types 
+        (name, optimal_temp_min, optimal_temp_max, optimal_humidity_min, optimal_humidity_max, harvest_days) 
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (
+            name, 
+            optimal_temp_min, 
+            optimal_temp_max,
+            optimal_humidity_min,
+            optimal_humidity_max,
+            harvest_days
+        ))
         connection.commit()
         
         plant_type_id = cursor.lastrowid
@@ -205,21 +246,26 @@ def create_plant_type():
         
         return jsonify({
             'status': 'success', 
-            'message': 'Tipo de planta creado correctamente',
+            'message': 'Plant type created successfully',
             'plant_type_id': plant_type_id
         })
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# Ruta para obtener tipos de plantas
+# Ruta para obtener tipos de plantas (ACTUALIZADA)
 @app.route('/api/python/plant-types', methods=['GET'])
 def get_plant_types():
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         
-        query = "SELECT * FROM plant_types ORDER BY name"
+        query = """
+        SELECT id, name, optimal_temp_min, optimal_temp_max, 
+               optimal_humidity_min, optimal_humidity_max, harvest_days 
+        FROM plant_types 
+        ORDER BY name
+        """
         cursor.execute(query)
         results = cursor.fetchall()
         
@@ -233,8 +279,7 @@ def get_plant_types():
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-          
-
+        
 # Ruta para obtener datos históricos para la gráfica
 @app.route('/api/python/historical-data', methods=['GET'])
 def get_historical_data():
