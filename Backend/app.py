@@ -3,6 +3,15 @@ from flask_cors import CORS
 import mysql.connector
 from datetime import datetime, timedelta
 import json
+import pandas as pd
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+import matplotlib
+matplotlib.use('Agg')
 
 app = Flask(__name__)
 CORS(app)  # Permite comunicación con tu frontend
@@ -840,6 +849,206 @@ def fallback_predictions():
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/python/generate-report', methods=['GET'])
+def generate_report():
+    try:
+        connection = get_db_connection()
+        
+        # 1. Obtener datos para el reporte
+        report_data = get_report_data(connection)
+        
+        # 2. Generar PDF
+        pdf_buffer = generate_pdf_report(report_data)
+        
+        connection.close()
+        
+        # 3. Devolver el PDF
+        return send_file(
+            pdf_buffer,
+            as_attachment=True,
+            download_name=f'harvest_report_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf',
+            mimetype='application/pdf'
+        )
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def get_report_data(connection):
+    cursor = connection.cursor(dictionary=True)
+    
+    # Datos de plantas y sensores
+    query_plants = """
+    SELECT 
+        p.id,
+        pt.name as plant_type,
+        p.planting_date,
+        DATEDIFF(CURDATE(), p.planting_date) as days_elapsed,
+        pt.optimal_temp_min,
+        pt.optimal_temp_max,
+        pt.optimal_humidity_min,
+        pt.optimal_humidity_max,
+        pt.harvest_days
+    FROM plants p
+    JOIN plant_types pt ON p.plant_type_id = pt.id
+    WHERE p.planting_date IS NOT NULL
+    """
+    cursor.execute(query_plants)
+    plants_data = cursor.fetchall()
+    
+    # Últimas lecturas de sensores
+    query_readings = """
+    SELECT 
+        sr.plant_id,
+        pt.name as plant_type,
+        AVG(sr.temperature) as avg_temperature,
+        AVG(sr.humidity) as avg_humidity,
+        MAX(sr.reading_timestamp) as last_reading,
+        COUNT(sr.id) as readings_count
+    FROM sensor_reading sr
+    JOIN plants p ON sr.plant_id = p.id
+    JOIN plant_types pt ON p.plant_type_id = pt.id
+    WHERE sr.reading_timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+    GROUP BY sr.plant_id, pt.name
+    """
+    cursor.execute(query_readings)
+    readings_data = cursor.fetchall()
+    
+    # Predicciones recientes
+    query_predictions = """
+    SELECT 
+        ah.plant_id,
+        pt.name as plant_type,
+        ah.results->>'$.days_to_harvest' as days_to_harvest,
+        ah.results->>'$.yield_g' as yield_grams,
+        ah.analysis_timestamp
+    FROM analysis_history ah
+    JOIN plants p ON ah.plant_id = p.id
+    JOIN plant_types pt ON p.plant_type_id = pt.id
+    WHERE ah.analysis_type = 'harvest_prediction'
+    AND ah.analysis_timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ORDER BY ah.analysis_timestamp DESC
+    """
+    cursor.execute(query_predictions)
+    predictions_data = cursor.fetchall()
+    
+    cursor.close()
+    
+    return {
+        'plants': plants_data,
+        'readings': readings_data,
+        'predictions': predictions_data,
+        'generation_date': datetime.now(),
+        'period_covered': 'Last 30 days'
+    }
+
+def generate_pdf_report(report_data):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Título
+    title = Paragraph("Harvest Predictor - System Report", styles['Title'])
+    story.append(title)
+    story.append(Spacer(1, 12))
+    
+    # Fecha de generación
+    gen_date = Paragraph(f"Generated on: {report_data['generation_date'].strftime('%Y-%m-%d %H:%M')}", styles['Normal'])
+    story.append(gen_date)
+    story.append(Spacer(1, 20))
+    
+    # Resumen Ejecutivo
+    summary_title = Paragraph("Executive Summary", styles['Heading2'])
+    story.append(summary_title)
+    
+    total_plants = len(report_data['plants'])
+    active_sensors = len(report_data['readings'])
+    
+    summary_data = [
+        ["Metric", "Value"],
+        ["Total Plants", str(total_plants)],
+        ["Active Sensors", str(active_sensors)],
+        ["Report Period", report_data['period_covered']],
+        ["System Status", "Operational" if active_sensors > 0 else "Needs Attention"]
+    ]
+    
+    summary_table = Table(summary_data)
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.green),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    story.append(summary_table)
+    story.append(Spacer(1, 20))
+    
+    # Tabla de Plantas
+    plants_title = Paragraph("Plants Overview", styles['Heading2'])
+    story.append(plants_title)
+    
+    plants_table_data = [["Plant ID", "Type", "Planting Date", "Days Elapsed", "Status"]]
+    for plant in report_data['plants']:
+        status = "Optimal" if plant['days_elapsed'] < plant['harvest_days'] else "Ready for Harvest"
+        plants_table_data.append([
+            str(plant['id']),
+            plant['plant_type'],
+            plant['planting_date'].strftime('%Y-%m-%d') if plant['planting_date'] else 'N/A',
+            str(plant['days_elapsed']),
+            status
+        ])
+    
+    plants_table = Table(plants_table_data)
+    plants_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.green),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 8)
+    ]))
+    story.append(plants_table)
+    story.append(Spacer(1, 20))
+    
+    # Predicciones
+    if report_data['predictions']:
+        predictions_title = Paragraph("Harvest Predictions", styles['Heading2'])
+        story.append(predictions_title)
+        
+        predictions_data = [["Plant ID", "Type", "Days to Harvest", "Estimated Yield"]]
+        for pred in report_data['predictions']:
+            yield_kg = float(pred['yield_grams']) / 1000 if pred['yield_grams'] else 0
+            predictions_data.append([
+                str(pred['plant_id']),
+                pred['plant_type'],
+                pred['days_to_harvest'] or 'N/A',
+                f"{yield_kg:.2f} kg" if pred['yield_grams'] else 'N/A'
+            ])
+        
+        predictions_table = Table(predictions_data)
+        predictions_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.lightblue),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, -1), 8)
+        ]))
+        story.append(predictions_table)
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
 
 if __name__ == '__main__':
     print("=== Harvest Predictor Backend ===")

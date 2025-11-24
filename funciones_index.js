@@ -270,3 +270,51 @@ document.addEventListener('DOMContentLoaded', function() {
     // Actualizar cada 30 segundos
     setInterval(loadDashboardData, 30000);
 });
+
+async function downloadReport() {
+    try {
+        // Mostrar indicador de carga
+        const downloadBtn = document.querySelector('a[href="#"].btn');
+        const originalText = downloadBtn.innerHTML;
+        downloadBtn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Generating report...';
+        
+        const response = await fetch(`${PYTHON_BACKEND}/generate-report`);
+        
+        if (!response.ok) {
+            throw new Error('Error generating report');
+        }
+        
+        // Crear blob y descargar
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `harvest_report_${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        // Restaurar botón
+        downloadBtn.innerHTML = originalText;
+        
+    } catch (error) {
+        console.error('Error downloading report:', error);
+        alert('Error generating report: ' + error.message);
+        
+        // Restaurar botón en caso de error
+        const downloadBtn = document.querySelector('a[href="#"].btn');
+        downloadBtn.innerHTML = '<i class="bx bxs-report"></i> Download report';
+    }
+}
+
+// Agregar event listener al botón
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.querySelector('a[href="#"].btn');
+    if (downloadBtn && downloadBtn.innerHTML.includes('bxs-report')) {
+        downloadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            downloadReport();
+        });
+    }
+});
