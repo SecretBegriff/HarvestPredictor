@@ -589,6 +589,146 @@ def get_temperature_details():
         mimetype="application/pdf"
     )
 
+# Ruta para obtener todas las plantas con sus datos
+@app.route('/api/python/plants', methods=['GET'])
+def get_all_plants():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        query = """
+        SELECT 
+            p.id,
+            p.planting_date,
+            pt.name as plant_type_name,
+            pt.optimal_temp_min,
+            pt.optimal_temp_max,
+            pt.optimal_humidity_min,
+            pt.optimal_humidity_max,
+            pt.harvest_days
+        FROM plants p
+        JOIN plant_types pt ON p.plant_type_id = pt.id
+        ORDER BY p.id
+        """
+        cursor.execute(query)
+        plants = cursor.fetchall()
+        
+        # Convertir datetime a string para JSON
+        for plant in plants:
+            if plant.get('planting_date'):
+                plant['planting_date'] = plant['planting_date'].isoformat()
+        
+        cursor.close()
+        connection.close()
+        
+        return jsonify({
+            'status': 'success',
+            'data': plants
+        })
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# Ruta para obtener las lecturas más recientes de todas las plantas
+@app.route('/api/python/recent-readings', methods=['GET'])
+def get_recent_readings():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        query = """
+        SELECT 
+            sr.plant_id,
+            pt.name as plant_name,
+            sr.temperature,
+            sr.humidity,
+            sr.reading_timestamp,
+            CASE 
+                WHEN sr.temperature BETWEEN pt.optimal_temp_min AND pt.optimal_temp_max 
+                     AND sr.humidity BETWEEN pt.optimal_humidity_min AND pt.optimal_humidity_max 
+                THEN 'Active' 
+                ELSE 'Out of Range' 
+            END as sensor_status
+        FROM sensor_reading sr
+        JOIN plants p ON sr.plant_id = p.id
+        JOIN plant_types pt ON p.plant_type_id = pt.id
+        WHERE sr.reading_timestamp IN (
+            SELECT MAX(reading_timestamp) 
+            FROM sensor_reading 
+            GROUP BY plant_id
+        )
+        ORDER BY sr.reading_timestamp DESC
+        """
+        cursor.execute(query)
+        readings = cursor.fetchall()
+        
+        # Convertir datetime a string para JSON
+        for reading in readings:
+            if reading.get('reading_timestamp'):
+                reading['reading_timestamp'] = reading['reading_timestamp'].isoformat()
+        
+        cursor.close()
+        connection.close()
+        
+        return jsonify({
+            'status': 'success',
+            'data': readings
+        })
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# Ruta para actualizar una planta
+@app.route('/api/python/update-plant/<int:plant_id>', methods=['PUT'])
+def update_plant(plant_id):
+    try:
+        data = request.get_json()
+        
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Primero obtenemos el plant_type_id de la planta
+        cursor.execute("SELECT plant_type_id FROM plants WHERE id = %s", (plant_id,))
+        plant = cursor.fetchone()
+        
+        if not plant:
+            return jsonify({'status': 'error', 'message': 'Plant not found'}), 404
+        
+        plant_type_id = plant['plant_type_id']
+        
+        # Actualizamos el plant_type
+        update_query = """
+        UPDATE plant_types 
+        SET name = %s, 
+            optimal_temp_min = %s, 
+            optimal_temp_max = %s, 
+            optimal_humidity_min = %s, 
+            optimal_humidity_max = %s, 
+            harvest_days = %s
+        WHERE id = %s
+        """
+        cursor.execute(update_query, (
+            data['name'],
+            float(data['optimal_temp_min']),
+            float(data['optimal_temp_max']),
+            float(data['optimal_humidity_min']),
+            float(data['optimal_humidity_max']),
+            int(data['harvest_days']),
+            plant_type_id
+        ))
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Plant updated successfully'
+        })
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 if __name__ == '__main__':
     print("=== Harvest Predictor Backend ===")
     print("Iniciando servidor en http://localhost:5000")
