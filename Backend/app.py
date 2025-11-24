@@ -71,15 +71,13 @@ def get_dashboard_data():
             sr.temperature,
             sr.humidity,
             sr.reading_timestamp,
-            pt.optimal_temp,
-            pt.optimal_humidity
+            pt.optimal_temp_min,
+            pt.optimal_temp_max,
+            pt.optimal_humidity_min,
+            pt.optimal_humidity_max
         FROM sensor_reading sr
         JOIN plants p ON sr.plant_id = p.id
         JOIN plant_types pt ON p.plant_type_id = pt.id
-        WHERE sr.reading_timestamp = (
-            SELECT MAX(reading_timestamp) 
-            FROM sensor_reading
-        )
         ORDER BY sr.reading_timestamp DESC
         LIMIT 1
         """
