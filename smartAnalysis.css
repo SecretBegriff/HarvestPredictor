@@ -1,0 +1,39 @@
+/* Fondo suave para la página */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Tarjetas de métricas superiores */
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    transition: transform 0.2s;
+}
+.metric-card:hover {
+    transform: translateY(-3px);
+}
+
+/* TARJETA PRINCIPAL DE LA IA (Gemini) */
+.ai-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border-radius: 15px;
+    border: 1px solid #d1e7dd;
+    overflow: hidden;
+}
+
+/* Icono del robot */
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #11998e, #38ef7d);
+    box-shadow: 0 4px 10px rgba(56, 239, 125, 0.4);
+}
+
+/* Alert Box personalizado */
+#ai-alert-box {
+    border-left: 5px solid; /* El color se pone dinámicamente con JS */
+}
+
+/* Colores de alerta dinámicos */
+.alert-CRITICAL { border-color: #dc3545 !important; color: #842029; background-color: #f8d7da !important; }
+.alert-WARNING { border-color: #ffc107 !important; color: #664d03; background-color: #fff3cd !important; }
+.alert-OPTIMAL { border-color: #198754 !important; color: #0f5132; background-color: #d1e7dd !important; }
+.alert-INFO { border-color: #0dcaf0 !important; color: #055160; background-color: #cff4fc !important; }
